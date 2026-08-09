@@ -313,8 +313,8 @@
     </div>
 
     <script>
-        const SENDKEY = 'SCT379441Tav8ooADrFYlXdiwLEZTrvM7D';
-        const SERVER_CHAN_URL = 'https://sctapi.ftqq.com';
+        const PUSHPLUS_TOKEN = '2555b5102c9c452ea0804b1e91665031';
+        const PUSHPLUS_URL = 'https://www.pushplus.plus/send';
         const BASE_URL = 'https://2940552786.github.io/food-picker/';
 
         const foods = [
@@ -496,12 +496,13 @@
                 const noteDisplay=noteVal?'\n| 💬 **备注** | '+noteVal+' |':'';
                 const foodEncoded=encodeURIComponent(selectedFood.name);
                 const replyLink=BASE_URL+'?reply=yes&food='+foodEncoded;
-                const resp=await fetch(`${SERVER_CHAN_URL}/${SENDKEY}.send`,{
+                const resp=await fetch(PUSHPLUS_URL,{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
                     body:JSON.stringify({
-                        title:`💕 小米粥想吃的：${selectedFood.emoji} ${selectedFood.name}`,
-                        desp:[
+                        token: PUSHPLUS_TOKEN,
+                        title: `💕 小米粥想吃的：${selectedFood.emoji} ${selectedFood.name}`,
+                        content: [
                             `## 💕 约会吃什么？`,
                             ``,
                             `| 项目 | 内容 |`,
@@ -515,10 +516,11 @@
                             ``,
                             `[✅ 点我确认收到](${replyLink})`,
                         ].filter(l=>l!==undefined).join('\n'),
+                        template: 'markdown',
                     }),
                 });
                 const data=await resp.json();
-                if(data&&data.code===0){
+                if(data&&data.code===200){
                     // 保存到历史
                     saveHistory({ food:selectedFood.name, emoji:selectedFood.emoji, date:dateVal, time:timeVal, note:noteVal, ts:Date.now() });
                     // 启动倒计时
