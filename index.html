@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💕 约会吃什么？</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>💕 想吃什么呢？</title>
     <style>
         :root {
             --pink: #ff6b9d;
@@ -271,7 +272,7 @@
     <div class="container">
         <div class="header">
             <div class="icon-row">💕</div>
-            <h1>约会吃什么？</h1>
+            <h1>想吃什么呢？</h1>
             <p class="subtitle">选一个你想吃的，告诉我~</p>
         </div>
 
@@ -364,9 +365,10 @@
 
                 const img = document.createElement('div');
                 img.className = 'card-img';
-                // 用 Unsplash 真实图片，specific search + seed 保证一致性
+                // 使用 LoremFlickr 真实美食图片（来自 Flickr）
+                const cacheBuster = 'v=' + Date.now().toString(36);
                 img.style.backgroundImage =
-                    `url(https://source.unsplash.com/400x400/?${encodeURIComponent(food.img)}&sig=${i+1})`;
+                    `url(https://loremflickr.com/400/400/${encodeURIComponent(food.img)}?${cacheBuster})`;
                 // 图片加载失败时显示渐变背景
                 img.style.backgroundColor = hslGradient(i);
 
