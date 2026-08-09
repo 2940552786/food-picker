@@ -325,15 +325,15 @@
 
         // ==================== 美食数据（9个精选 + 真实图片） ====================
         const foods = [
-            { name: '湘菜',   emoji: '🌶️', img: 'hunan-food,spicy-chinese-cuisine' },
-            { name: '烤鱼',   emoji: '🐟', img: 'grilled-fish,chinese-grilled-fish' },
-            { name: '日料',   emoji: '🍣', img: 'sushi,japanese-cuisine,sashimi' },
-            { name: '小火锅', emoji: '🫕', img: 'chinese-hotpot,personal-hotpot' },
-            { name: '烤肉',   emoji: '🥩', img: 'korean-bbq,grilled-meat,barbecue' },
-            { name: '西餐',   emoji: '🍝', img: 'steak,pasta,western-dining' },
-            { name: '麻辣烫', emoji: '🥘', img: 'malatang,spicy-soup,chinese-street-food' },
-            { name: '披萨',   emoji: '🍕', img: 'pizza,margherita,italian-food' },
-            { name: '汉堡',   emoji: '🍔', img: 'burger,gourmet-burger,fries' },
+            { name: '湘菜',   emoji: '🌶️' },
+            { name: '烤鱼',   emoji: '🐟' },
+            { name: '日料',   emoji: '🍣' },
+            { name: '小火锅', emoji: '🫕' },
+            { name: '烤肉',   emoji: '🥩' },
+            { name: '西餐',   emoji: '🍝' },
+            { name: '麻辣烫', emoji: '🥘' },
+            { name: '披萨',   emoji: '🍕' },
+            { name: '汉堡',   emoji: '🍔' },
         ];
 
         let selectedFood = null;
@@ -363,29 +363,29 @@
                 card.className = 'food-card';
                 card.onclick = () => openConfirm(food);
 
-                const img = document.createElement('div');
-                img.className = 'card-img';
-                // 使用 LoremFlickr 真实美食图片（来自 Flickr）
-                const cacheBuster = 'v=' + Date.now().toString(36);
-                img.style.backgroundImage =
-                    `url(https://loremflickr.com/400/400/${encodeURIComponent(food.img)}?${cacheBuster})`;
-                // 图片加载失败时显示渐变背景
-                img.style.backgroundColor = hslGradient(i);
+                // 纯色渐变背景 + 大 emoji，简洁好看
+                const bg = document.createElement('div');
+                bg.className = 'card-img';
+                bg.style.background = hslGradient(i);
+                bg.style.display = 'flex';
+                bg.style.alignItems = 'center';
+                bg.style.justifyContent = 'center';
+                bg.style.fontSize = '64px';
+
+                const bigEmoji = document.createElement('span');
+                bigEmoji.textContent = food.emoji;
+                bigEmoji.style.filter = 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))';
+                bg.appendChild(bigEmoji);
 
                 const overlay = document.createElement('div');
                 overlay.className = 'card-overlay';
-
-                const emoji = document.createElement('div');
-                emoji.className = 'card-emoji';
-                emoji.textContent = food.emoji;
 
                 const label = document.createElement('div');
                 label.className = 'card-label';
                 label.textContent = food.name;
 
-                card.appendChild(img);
+                card.appendChild(bg);
                 card.appendChild(overlay);
-                card.appendChild(emoji);
                 card.appendChild(label);
                 grid.appendChild(card);
             });
@@ -403,9 +403,18 @@
         }
 
         function hslGradient(i) {
-            const hues = [10,30,50,70,90,110,130,150,170];
-            const h = hues[i%hues.length];
-            return `hsl(${h}, 55%, 45%)`;
+            const gradients = [
+                'linear-gradient(135deg, #ff6b6b, #ee5a24)',
+                'linear-gradient(135deg, #ff9f43, #f368e0)',
+                'linear-gradient(135deg, #feca57, #ff9f43)',
+                'linear-gradient(135deg, #ff6348, #e84393)',
+                'linear-gradient(135deg, #e056a0, #c44569)',
+                'linear-gradient(135deg, #a29bfe, #6c5ce7)',
+                'linear-gradient(135deg, #fd79a8, #e84393)',
+                'linear-gradient(135deg, #fdcb6e, #f39c12)',
+                'linear-gradient(135deg, #00b894, #00cec9)',
+            ];
+            return gradients[i % gradients.length];
         }
 
         // ==================== 确认弹窗（预设菜品） ====================
