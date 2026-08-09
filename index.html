@@ -42,7 +42,6 @@
             margin:4px 0 2px; font-weight:900; letter-spacing:2px;
         }
         .header .subtitle { font-size:clamp(13px,2.2vw,15px); color:#9b8aad; }
-        .header .ver { font-size:10px; color:#d0c0e0; margin-top:2px; }
 
         /* -- 随机按钮 -- */
         .random-row { text-align:center; margin:14px 0 4px; }
@@ -54,7 +53,6 @@
             cursor:pointer; transition:all .3s; letter-spacing:1px;
             -webkit-tap-highlight-color:transparent; user-select:none;
         }
-        .btn-random:hover { border-color:#c44dff; color:#c44dff; transform:translateY(-2px); }
         .btn-random:active { transform:scale(.95); }
         .btn-random.spinning { animation:shake .5s ease; pointer-events:none; }
         @keyframes shake {
@@ -77,7 +75,6 @@
             display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
             -webkit-tap-highlight-color:transparent; user-select:none; overflow:hidden;
         }
-        .food-card:hover { transform:translateY(-5px) scale(1.03); box-shadow:0 12px 30px rgba(150,100,180,.18); }
         .food-card:active { transform:scale(.95); transition:transform .1s; }
         .food-card .card-stripe { position:absolute; top:0; left:0; right:0; height:6px; border-radius:20px 20px 0 0; }
         .food-card .card-emoji { font-size:50px; transition:transform .3s; }
@@ -109,7 +106,6 @@
             font-size:14px; color:#b8a8cc; cursor:pointer; letter-spacing:1px;
             -webkit-tap-highlight-color:transparent;
         }
-        .history-toggle:hover { color:#8b6bab; }
         .history-list { display:none; }
         .history-list.open { display:block; }
         .history-item {
@@ -221,7 +217,6 @@
             <div class="icon-row">💕</div>
             <h1>想吃什么呢？</h1>
             <p class="subtitle">选一个你想吃的，告诉我~</p>
-            <p class="ver">v3.0 全面升级版</p>
         </div>
 
         <!-- 随机按钮 -->
@@ -248,15 +243,7 @@
         <!-- 美食网格 -->
         <div class="food-grid" id="foodGrid"></div>
 
-        <!-- 历史记录 -->
-        <div class="history-section" id="historySection">
-            <button class="history-toggle" id="historyToggle" onclick="toggleHistory()">
-                📜 约会记录 <span id="historyCount" style="font-size:11px;color:#d0c0e0;"></span>
-            </button>
-            <div class="history-list" id="historyList"></div>
-        </div>
-
-        <div class="footer">
+        <!-- 美食网格 -->
             Made with <span class="heart">❤️</span> for our date
         </div>
     </div>
@@ -367,7 +354,6 @@
             createHearts();
             createCards();
             loadCountdown();
-            renderHistory();
             setInterval(loadCountdown, 30000);
             
             // 检查是否有待确认的提交
@@ -544,10 +530,8 @@
                 });
                 const data=await resp.json();
                 if(data&&data.code===200){
-                    saveHistory({ food:selectedFood.name, emoji:selectedFood.emoji, date:dateVal, time:timeVal, note:noteVal, ts:Date.now() });
                     saveCountdown({ food:selectedFood.name, emoji:selectedFood.emoji, date:dateVal, time:timeVal });
                     loadCountdown();
-                    renderHistory();
                     closeAllModals();
                     // 开始等待确认
                     currentSelectionId = selId;
@@ -587,39 +571,6 @@
             document.getElementById('cdTimer').innerHTML=timer;
         }
 
-        // ==================== 历史记录 ====================
-        function saveHistory(item){
-            const raw=localStorage.getItem('foodpicker_history');
-            const list=raw?JSON.parse(raw):[];
-            list.unshift(item);
-            if(list.length>20) list.length=20;
-            localStorage.setItem('foodpicker_history',JSON.stringify(list));
-        }
-        function renderHistory(){
-            const raw=localStorage.getItem('foodpicker_history');
-            const list=raw?JSON.parse(raw):[];
-            const el=document.getElementById('historyList');
-            const countEl=document.getElementById('historyCount');
-            const toggle=document.getElementById('historyToggle');
-            if(list.length===0){
-                toggle.style.display='none'; el.innerHTML=''; return;
-            }
-            toggle.style.display='flex';
-            countEl.textContent='('+list.length+'次)';
-            el.innerHTML=list.map(item=>{
-                const d=new Date(item.date);
-                const days=['日','一','二','三','四','五','六'];
-                const noteHtml=item.note?`<div class="hi-note">💬 ${item.note}</div>`:'';
-                return `<div class="history-item">
-                    <div><span class="hi-food">${item.emoji} ${item.food}</span>${noteHtml}</div>
-                    <div class="hi-time">${item.date} 周${days[d.getDay()]} ${item.time}</div>
-                </div>`;
-            }).join('');
-        }
-        function toggleHistory(){
-            const el=document.getElementById('historyList');
-            el.classList.toggle('open');
-        }
 
         // ==================== Toast ====================
         function showToast(msg,type){
