@@ -238,6 +238,13 @@
             <div class="cd-timer" id="cdTimer"></div>
         </div>
 
+        <!-- 确认反馈条 -->
+        <div class="countdown-bar" id="feedbackBar" style="display:none;">
+            <div class="cd-title" id="fbTitle">⏳ 等待 TA 确认...</div>
+            <div class="cd-food" id="fbFood"></div>
+            <div class="cd-timer" id="fbStatus" style="color:#c44dff;">选好了会通知你~</div>
+        </div>
+
         <!-- 美食网格 -->
         <div class="food-grid" id="foodGrid"></div>
 
@@ -316,6 +323,9 @@
         const PUSHPLUS_TOKEN = '2555b5102c9c452ea0804b1e91665031';
         const PUSHPLUS_URL = 'https://www.pushplus.plus/send';
         const BASE_URL = 'https://2940552786.github.io/food-picker/';
+        const STATE_RAW_URL = 'https://raw.githubusercontent.com/2940552786/food-picker/master/state.json';
+        const STATE_API_URL = 'https://api.github.com/repos/2940552786/food-picker/contents/state.json';
+        const GITHUB_TOKEN = 'GITHUB_TOKEN_PLACEHOLDER'; // 替换为你的 GitHub Token
 
         const foods = [
             { name:'湘菜',   emoji:'🌶️' },
@@ -332,11 +342,20 @@
 
         let selectedFood = null;
         let countdownInterval = null;
+        let pollTimer = null;
+        let currentSelectionId = null;
 
         // ==================== 初始化 ====================
         function init() {
-            // 检查是否是回复确认链接
             const params = new URLSearchParams(location.search);
+            
+            // 男生点击确认链接 → 更新状态
+            if (params.get('confirm')) {
+                handleConfirmation(params.get('confirm'), params.get('food') || '');
+                return;
+            }
+            
+            // 女生打开回复页（旧版兼容）
             if (params.get('reply') === 'yes') {
                 document.getElementById('mainPage').style.display = 'none';
                 document.getElementById('replyPage').classList.add('show');
@@ -349,7 +368,10 @@
             createCards();
             loadCountdown();
             renderHistory();
-            setInterval(loadCountdown, 30000); // 每30秒刷新倒计时
+            setInterval(loadCountdown, 30000);
+            
+            // 检查是否有待确认的提交
+            checkPendingConfirmation();
         }
 
         // ==================== 浮动爱心 ====================
@@ -495,7 +517,8 @@
                 const timeDisplay=timeVal;
                 const noteDisplay=noteVal?'\n| 💬 **备注** | '+noteVal+' |':'';
                 const foodEncoded=encodeURIComponent(selectedFood.name);
-                const replyLink=BASE_URL+'?reply=yes&food='+foodEncoded;
+                const selId = 's'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+                const replyLink=BASE_URL+'?confirm='+selId+'&food='+foodEncoded;
                 const resp=await fetch(PUSHPLUS_URL,{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
@@ -521,14 +544,16 @@
                 });
                 const data=await resp.json();
                 if(data&&data.code===200){
-                    // 保存到历史
                     saveHistory({ food:selectedFood.name, emoji:selectedFood.emoji, date:dateVal, time:timeVal, note:noteVal, ts:Date.now() });
-                    // 启动倒计时
                     saveCountdown({ food:selectedFood.name, emoji:selectedFood.emoji, date:dateVal, time:timeVal });
                     loadCountdown();
                     renderHistory();
                     closeAllModals();
-                    showToast('已经告诉 TA 啦~ ❤️','success');
+                    // 开始等待确认
+                    currentSelectionId = selId;
+                    localStorage.setItem('foodpicker_pending', JSON.stringify({id:selId, food:selectedFood.name, emoji:selectedFood.emoji, ts:Date.now()}));
+                    startPolling(selId);
+                    showToast('已通知 TA，等待确认中... 💌', 'success');
                 }else{
                     throw new Error((data&&data.message)||'发送失败');
                 }
@@ -604,6 +629,121 @@
             t.textContent=msg;
             document.body.appendChild(t);
             setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(()=>t.remove(),400); },2500);
+        }
+
+        // ==================== 确认反馈（男生点击确认链接） ====================
+        async function handleConfirmation(selId, foodName) {
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('replyPage').classList.add('show');
+            const detail = document.getElementById('replyDetail');
+            detail.textContent = '带小米粥去吃 ' + decodeURIComponent(foodName || '好吃的') + '！';
+            
+            // 通过 GitHub API 更新 state.json
+            if (GITHUB_TOKEN !== 'GITHUB_TOKEN_PLACEHOLDER') {
+                try {
+                    // 先获取当前 state.json 的 SHA
+                    const getResp = await fetch(STATE_API_URL, {
+                        headers: { 'Authorization': 'token ' + GITHUB_TOKEN, 'Accept': 'application/vnd.github.v3+json' }
+                    });
+                    const getData = await getResp.json();
+                    const sha = getData.sha;
+                    let state = {};
+                    try { state = JSON.parse(atob(getData.content)); } catch(e) {}
+                    
+                    // 更新状态
+                    state[selId] = { confirmed: true, food: decodeURIComponent(foodName || ''), ts: Date.now() };
+                    const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+                    
+                    await fetch(STATE_API_URL, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': 'token ' + GITHUB_TOKEN,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: '✅ 确认: ' + (decodeURIComponent(foodName || '好吃的')),
+                            content: newContent,
+                            sha: sha,
+                        }),
+                    });
+                    console.log('✅ 确认状态已更新');
+                } catch(e) {
+                    console.error('更新确认状态失败:', e);
+                }
+            }
+            
+            // 也发一条 PushPlus 确认消息
+            try {
+                await fetch(PUSHPLUS_URL, {
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        token: PUSHPLUS_TOKEN,
+                        title: '✅ TA已确认！',
+                        content: '## ✅ 已确认收到！\n\n带小米粥去吃 **' + decodeURIComponent(foodName || '好吃的') + '** 吧！❤️',
+                        template: 'markdown',
+                    }),
+                });
+            } catch(e) {}
+        }
+
+        // ==================== 轮询确认状态 ====================
+        function startPolling(selId) {
+            const bar = document.getElementById('feedbackBar');
+            bar.style.display = 'block';
+            document.getElementById('fbTitle').textContent = '⏳ 等待 TA 确认...';
+            document.getElementById('fbStatus').textContent = '选好了会通知你~';
+            
+            // 保存当前选择信息
+            const pending = JSON.parse(localStorage.getItem('foodpicker_pending') || '{}');
+            document.getElementById('fbFood').textContent = (pending.emoji||'🍽️') + ' ' + (pending.food||'');
+            
+            if (pollTimer) clearInterval(pollTimer);
+            let pollCount = 0;
+            pollTimer = setInterval(async () => {
+                pollCount++;
+                try {
+                    const resp = await fetch(STATE_RAW_URL + '?t=' + Date.now());
+                    const state = await resp.json();
+                    if (state[selId] && state[selId].confirmed) {
+                        // 确认了！
+                        clearInterval(pollTimer);
+                        pollTimer = null;
+                        document.getElementById('fbTitle').textContent = '✅ TA 已确认！';
+                        document.getElementById('fbStatus').innerHTML = '<span style="color:#22c55e;font-size:18px;">带你去吃好吃的！💕</span>';
+                        localStorage.removeItem('foodpicker_pending');
+                        currentSelectionId = null;
+                        showToast('TA 已确认收到！💕', 'success');
+                    } else if (pollCount > 120) {
+                        // 2小时后停止轮询
+                        clearInterval(pollTimer);
+                        pollTimer = null;
+                        bar.style.display = 'none';
+                        localStorage.removeItem('foodpicker_pending');
+                        currentSelectionId = null;
+                    }
+                } catch(e) {
+                    console.error('轮询失败:', e);
+                }
+            }, 5000);
+        }
+
+        function checkPendingConfirmation() {
+            const pending = localStorage.getItem('foodpicker_pending');
+            if (pending) {
+                try {
+                    const p = JSON.parse(pending);
+                    if (p.id && Date.now() - p.ts < 7200000) {
+                        currentSelectionId = p.id;
+                        startPolling(p.id);
+                    } else {
+                        localStorage.removeItem('foodpicker_pending');
+                    }
+                } catch(e) {
+                    localStorage.removeItem('foodpicker_pending');
+                }
+            }
         }
 
         init();
