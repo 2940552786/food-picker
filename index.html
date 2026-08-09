@@ -2,295 +2,267 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#c44dff">
+    <link rel="manifest" href="manifest.json">
     <title>💕 想吃什么呢？</title>
     <style>
         :root {
-            --pink: #ff6b9d;
-            --purple: #c44dff;
+            --pink: #ff6b9d; --purple: #c44dff;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
                 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-            min-height: 100vh;
+            min-height: 100vh; min-height: 100dvh;
             background: linear-gradient(160deg, #fff0f5 0%, #f8e8ff 25%, #ffe0ec 50%, #f3e6ff 75%, #fff0f5 100%);
-            background-attachment: fixed;
-            overflow-x: hidden;
+            background-attachment: fixed; overflow-x: hidden;
         }
-
-        /* ---- 浮动背景 ---- */
-        .hearts-bg {
-            position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
-        }
-        .heart-float {
-            position: absolute; opacity: 0.12;
-            animation: floatUp linear infinite;
-        }
+        /* -- 浮动爱心 -- */
+        .hearts-bg { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+        .heart-float { position:absolute; opacity:0.11; animation:floatUp linear infinite; }
         @keyframes floatUp {
-            0%   { transform: translateY(105vh) scale(0.4) rotate(0deg); opacity: 0; }
-            10%  { opacity: 0.12; }
-            90%  { opacity: 0.12; }
-            100% { transform: translateY(-10vh) scale(1.1) rotate(360deg); opacity: 0; }
+            0%{transform:translateY(105vh) scale(0.3) rotate(0deg);opacity:0}
+            10%{opacity:.11} 90%{opacity:.11}
+            100%{transform:translateY(-10vh) scale(1.1) rotate(360deg);opacity:0}
         }
-
-        /* ---- 主容器 ---- */
-        .container {
-            position: relative; z-index: 1;
-            max-width: 800px; margin: 0 auto; padding: 25px 16px 50px;
-        }
-
-        /* ---- 头部 ---- */
-        .header { text-align: center; margin-bottom: 6px; }
-        .header .icon-row {
-            font-size: 44px; display: inline-block;
-            animation: bounce 2s ease-in-out infinite;
-        }
-        @keyframes bounce {
-            0%,100% { transform: translateY(0); }
-            50%     { transform: translateY(-10px); }
-        }
+        /* -- 主容器 -- */
+        .container { position:relative; z-index:1; max-width:820px; margin:0 auto; padding:22px 16px 50px; }
+        /* -- 头部 -- */
+        .header { text-align:center; margin-bottom:4px; }
+        .header .icon-row { font-size:42px; display:inline-block; animation:bounce 2s ease-in-out infinite; }
+        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
         .header h1 {
-            font-size: clamp(26px, 5.5vw, 38px);
-            background: linear-gradient(135deg, #ff4d6a, #c44dff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 4px 0 2px;
-            font-weight: 900;
-            letter-spacing: 2px;
+            font-size:clamp(26px,5.5vw,38px);
+            background:linear-gradient(135deg,#ff4d6a,#c44dff);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+            margin:4px 0 2px; font-weight:900; letter-spacing:2px;
         }
-        .header .subtitle {
-            font-size: clamp(13px, 2.2vw, 15px);
-            color: #9b8aad; font-weight: 400;
-        }
-        .header .ver {
-            font-size: 10px; color: #d0c0e0; margin-top: 2px;
-        }
+        .header .subtitle { font-size:clamp(13px,2.2vw,15px); color:#9b8aad; }
+        .header .ver { font-size:10px; color:#d0c0e0; margin-top:2px; }
 
-        /* ---- 网格 ---- */
+        /* -- 随机按钮 -- */
+        .random-row { text-align:center; margin:14px 0 4px; }
+        .btn-random {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:12px 28px; border-radius:50px;
+            background:#fff; border:2px dashed #d8c8e8;
+            font-size:16px; font-weight:700; color:#8b6bab;
+            cursor:pointer; transition:all .3s; letter-spacing:1px;
+            -webkit-tap-highlight-color:transparent; user-select:none;
+        }
+        .btn-random:hover { border-color:#c44dff; color:#c44dff; transform:translateY(-2px); }
+        .btn-random:active { transform:scale(.95); }
+        .btn-random.spinning { animation:shake .5s ease; pointer-events:none; }
+        @keyframes shake {
+            0%,100%{transform:translateX(0)}
+            25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+        }
+        .btn-random .rand-emoji { font-size:22px; animation:bounce 1.5s ease-in-out infinite; }
+
+        /* -- 网格 -- */
         .food-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 14px; margin-top: 20px;
+            display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:16px;
         }
-        @media (min-width: 600px) {
-            .food-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
-        }
-        @media (min-width: 800px) {
-            .food-grid { grid-template-columns: repeat(5, 1fr); gap: 20px; }
-        }
-
-        /* ---- 卡通卡片 ---- */
+        @media(min-width:600px){ .food-grid{grid-template-columns:repeat(3,1fr);gap:18px} }
+        @media(min-width:820px){ .food-grid{grid-template-columns:repeat(5,1fr);gap:20px} }
+        /* -- 卡片 -- */
         .food-card {
-            position: relative;
-            background: #fff;
-            border-radius: 20px;
-            cursor: pointer;
-            aspect-ratio: 1 / 1;
-            box-shadow: 0 4px 16px rgba(150,100,180,0.10);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            overflow: hidden;
+            position:relative; background:#fff; border-radius:20px; cursor:pointer;
+            aspect-ratio:1/1; box-shadow:0 4px 16px rgba(150,100,180,.10);
+            transition:transform .3s, box-shadow .3s;
+            display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+            -webkit-tap-highlight-color:transparent; user-select:none; overflow:hidden;
         }
-        .food-card:hover {
-            transform: translateY(-5px) scale(1.03);
-            box-shadow: 0 12px 30px rgba(150,100,180,0.18);
-        }
-        .food-card:active { transform: scale(0.95); transition: transform 0.1s ease; }
+        .food-card:hover { transform:translateY(-5px) scale(1.03); box-shadow:0 12px 30px rgba(150,100,180,.18); }
+        .food-card:active { transform:scale(.95); transition:transform .1s; }
+        .food-card .card-stripe { position:absolute; top:0; left:0; right:0; height:6px; border-radius:20px 20px 0 0; }
+        .food-card .card-emoji { font-size:50px; transition:transform .3s; }
+        .food-card:hover .card-emoji { transform:scale(1.15); }
+        .food-card .card-name { font-size:15px; font-weight:800; color:#3d2b4d; letter-spacing:1px; }
+        .food-card.card-other { border:3px dashed #d8c8e8; background:linear-gradient(135deg,#fefafe,#fdf5ff); }
+        .food-card.card-other .card-other-icon { font-size:36px; transition:transform .3s; }
+        .food-card.card-other:hover .card-other-icon { transform:scale(1.15) rotate(5deg); }
+        .food-card.card-other .card-other-hint { font-size:10px; color:#b8a8cc; }
 
-        /* 顶部色条 */
-        .food-card .card-stripe {
-            position: absolute; top: 0; left: 0; right: 0;
-            height: 6px;
-            border-radius: 20px 20px 0 0;
+        /* -- 倒计时 -- */
+        .countdown-bar {
+            display:none; margin:18px 0 6px; padding:16px 20px;
+            background:linear-gradient(135deg,#fff0f5,#f8e8ff);
+            border-radius:18px; text-align:center;
+            box-shadow:0 2px 12px rgba(150,100,180,.08);
+            animation:popIn .35s cubic-bezier(.175,.885,.32,1.275);
         }
+        .countdown-bar .cd-title { font-size:14px; color:#9b8aad; margin-bottom:4px; }
+        .countdown-bar .cd-food { font-size:22px; font-weight:800; color:#c44dff; }
+        .countdown-bar .cd-timer { font-size:15px; font-weight:700; color:#3d2b4d; margin-top:6px; }
+        .countdown-bar .cd-timer span { color:#ff4d6a; font-size:18px; }
 
-        /* 大 emoji */
-        .food-card .card-emoji {
-            font-size: 52px;
-            transition: transform 0.3s ease;
-            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.08));
+        /* -- 历史记录 -- */
+        .history-section { margin-top:28px; }
+        .history-toggle {
+            display:flex; align-items:center; justify-content:center; gap:6px;
+            width:100%; padding:12px; border:none; background:none;
+            font-size:14px; color:#b8a8cc; cursor:pointer; letter-spacing:1px;
+            -webkit-tap-highlight-color:transparent;
         }
-        .food-card:hover .card-emoji {
-            transform: scale(1.15);
+        .history-toggle:hover { color:#8b6bab; }
+        .history-list { display:none; }
+        .history-list.open { display:block; }
+        .history-item {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:12px 16px; margin:6px 0; background:#fff; border-radius:14px;
+            box-shadow:0 2px 8px rgba(150,100,180,.06); font-size:14px;
         }
+        .history-item .hi-food { font-weight:700; color:#3d2b4d; }
+        .history-item .hi-time { color:#9b8aad; font-size:12px; }
+        .history-item .hi-note { color:#c8b8d8; font-size:11px; font-style:italic; }
 
-        /* 菜名 */
-        .food-card .card-name {
-            font-size: 16px;
-            font-weight: 800;
-            color: #3d2b4d;
-            letter-spacing: 1px;
-        }
-
-        /* "其他" 卡片 */
-        .food-card.card-other {
-            border: 3px dashed #d8c8e8;
-            background: linear-gradient(135deg, #fefafe, #fdf5ff);
-        }
-        .food-card.card-other .card-other-icon {
-            font-size: 38px; transition: transform 0.3s ease;
-        }
-        .food-card.card-other:hover .card-other-icon { transform: scale(1.15) rotate(5deg); }
-        .food-card.card-other .card-other-hint {
-            font-size: 11px; color: #b8a8cc;
-        }
-
-        /* ---- 模态弹窗 ---- */
+        /* -- 模态弹窗 -- */
         .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            z-index: 1000;
-            display: flex; align-items: center; justify-content: center;
-            animation: fadeIn 0.2s ease;
+            position:fixed; inset:0; background:rgba(0,0,0,.5);
+            backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+            z-index:1000; display:flex; align-items:center; justify-content:center;
+            animation:fadeIn .2s;
         }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-
         .modal-dialog {
-            background: #fff; border-radius: 24px;
-            padding: 32px 26px 26px;
-            width: 90%; max-width: 380px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background:#fff; border-radius:24px; padding:28px 24px 24px;
+            width:92%; max-width:390px; text-align:center;
+            box-shadow:0 20px 60px rgba(0,0,0,.25);
+            animation:popIn .35s cubic-bezier(.175,.885,.32,1.275);
+            max-height:90vh; overflow-y:auto;
         }
-        @keyframes popIn {
-            from { transform: scale(0.8) translateY(30px); opacity:0; }
-            to   { transform: scale(1) translateY(0); opacity:1; }
-        }
-        .modal-dialog .modal-emoji { font-size: 56px; margin-bottom: 8px; }
-        .modal-dialog h2 { font-size: 20px; color: #2d1b3d; margin-bottom: 4px; }
+        @keyframes popIn { from{transform:scale(.8) translateY(30px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+        .modal-dialog .modal-emoji { font-size:52px; margin-bottom:6px; }
+        .modal-dialog h2 { font-size:19px; color:#2d1b3d; margin-bottom:4px; }
         .modal-dialog .food-name-highlight {
-            display: inline-block;
-            background: linear-gradient(135deg, #fff0f5, #f8e8ff);
-            color: #c44dff; font-weight: 800; font-size: 24px;
-            padding: 2px 14px; border-radius: 12px; margin: 8px 0 14px;
-            max-width: 100%; word-break: break-all;
+            display:inline-block; background:linear-gradient(135deg,#fff0f5,#f8e8ff);
+            color:#c44dff; font-weight:800; font-size:22px;
+            padding:2px 14px; border-radius:12px; margin:6px 0 10px;
+            max-width:100%; word-break:break-all;
         }
-        .modal-dialog .modal-sub { color: #8b7b9b; font-size: 13px; margin-bottom: 4px; }
-
+        .modal-dialog .modal-sub { color:#8b7b9b; font-size:13px; margin-bottom:4px; }
+        .datetime-row { display:flex; gap:8px; margin:10px 0; }
+        .dt-input {
+            flex:1; padding:11px 8px; border:2px solid #e8ddf5; border-radius:12px;
+            font-size:14px; text-align:center; font-weight:600; color:#2d1b3d;
+            outline:none; transition:border .2s; background:#fdfbff;
+            -webkit-tap-highlight-color:transparent;
+        }
+        .dt-input:focus { border-color:#c44dff; }
         .modal-input {
-            width: 100%; padding: 14px 16px;
-            border: 2px solid #e8ddf5; border-radius: 14px;
-            font-size: 18px; text-align: center;
-            font-weight: 600; color: #2d1b3d;
-            outline: none; transition: border 0.2s;
-            letter-spacing: 1px;
+            width:100%; padding:12px 14px; border:2px solid #e8ddf5; border-radius:14px;
+            font-size:16px; text-align:center; font-weight:600; color:#2d1b3d;
+            outline:none; transition:border .2s; letter-spacing:1px;
         }
-        .modal-input:focus { border-color: #c44dff; }
-        .modal-input::placeholder { color: #c8b8d8; font-weight: 400; }
-
-        .modal-buttons { display: flex; gap: 12px; margin-top: 18px; }
-
+        .modal-input:focus { border-color:#c44dff; }
+        .modal-input::placeholder { color:#c8b8d8; font-weight:400; }
+        .modal-buttons { display:flex; gap:10px; margin-top:16px; }
         .btn {
-            flex: 1; padding: 13px 16px; border-radius: 14px;
-            border: none; font-size: 15px; font-weight: 700;
-            cursor: pointer; transition: all 0.2s ease;
-            letter-spacing: 1px;
-            -webkit-tap-highlight-color: transparent;
+            flex:1; padding:12px 14px; border-radius:14px; border:none;
+            font-size:14px; font-weight:700; cursor:pointer; transition:all .2s;
+            letter-spacing:1px; -webkit-tap-highlight-color:transparent;
         }
-        .btn:active { transform: scale(0.95); }
-        .btn-cancel { background: #f0e8f5; color: #6b5b7b; }
-        .btn-cancel:hover { background: #e5d8f0; }
+        .btn:active { transform:scale(.95); }
+        .btn-cancel { background:#f0e8f5; color:#6b5b7b; }
         .btn-confirm {
-            background: linear-gradient(135deg, #ff4d6a, #c44dff);
-            color: #fff;
-            box-shadow: 0 4px 16px rgba(196,77,255,0.3);
+            background:linear-gradient(135deg,#ff4d6a,#c44dff); color:#fff;
+            box-shadow:0 4px 16px rgba(196,77,255,.3);
         }
-        .btn-confirm:hover {
-            box-shadow: 0 6px 24px rgba(196,77,255,0.45);
-            transform: translateY(-2px);
-        }
-        .btn-confirm:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-        /* ---- Toast ---- */
+        .btn-confirm:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+        .input-note { font-size:11px; color:#b8a8cc; margin-top:2px; }
+        /* -- Toast -- */
         .toast {
-            position: fixed; top: 30px; left: 50%;
-            transform: translateX(-50%); z-index: 2000;
-            padding: 15px 26px; border-radius: 18px;
-            font-weight: 700; font-size: 15px; color: #fff;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            animation: slideDown 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
-            text-align: center; max-width: 90%;
+            position:fixed; top:30px; left:50%; transform:translateX(-50%); z-index:2000;
+            padding:14px 24px; border-radius:18px; font-weight:700; font-size:14px; color:#fff;
+            box-shadow:0 8px 32px rgba(0,0,0,.2);
+            animation:slideDown .4s cubic-bezier(.175,.885,.32,1.275);
+            text-align:center; max-width:90%;
         }
-        @keyframes slideDown {
-            from { transform: translateX(-50%) translateY(-80px); opacity:0; }
-            to   { transform: translateX(-50%) translateY(0); opacity:1; }
-        }
-        .toast-success { background: linear-gradient(135deg, #22c55e, #16a34a); }
-        .toast-error  { background: linear-gradient(135deg, #ef4444, #dc2626); }
-
+        @keyframes slideDown { from{transform:translateX(-50%) translateY(-80px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
+        .toast-success { background:linear-gradient(135deg,#22c55e,#16a34a); }
+        .toast-error { background:linear-gradient(135deg,#ef4444,#dc2626); }
         .spinner {
-            display: inline-block; width: 20px; height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-top-color: #fff; border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-            vertical-align: middle; margin-right: 6px;
+            display:inline-block; width:18px; height:18px;
+            border:3px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%;
+            animation:spin .6s linear infinite; vertical-align:middle; margin-right:5px;
         }
         @keyframes spin { to{transform:rotate(360deg)} }
+        /* -- 回应确认页 -- */
+        .reply-page { display:none; text-align:center; padding:40px 20px; }
+        .reply-page.show { display:block; }
+        .reply-page .reply-emoji { font-size:72px; }
+        .reply-page h1 { font-size:26px; color:#2d1b3d; margin:12px 0; }
+        .reply-page .reply-detail { font-size:17px; color:#c44dff; font-weight:700; }
+        .reply-page .reply-btn {
+            display:inline-block; margin-top:20px; padding:14px 36px;
+            background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff;
+            border:none; border-radius:16px; font-size:18px; font-weight:700; cursor:pointer;
+            letter-spacing:1px; box-shadow:0 4px 16px rgba(34,197,94,.3);
+        }
+        .reply-page .reply-btn:active { transform:scale(.95); }
 
-        .footer {
-            text-align: center; margin-top: 35px;
-            color: #c8b8d8; font-size: 12px; letter-spacing: 1px;
-        }
-        .footer .heart {
-            color: #ff6b9d; display: inline-block;
-            animation: heartbeat 1.2s ease-in-out infinite;
-        }
-        @keyframes heartbeat {
-            0%,100%{transform:scale(1)} 25%{transform:scale(1.3)} 50%{transform:scale(1)} 75%{transform:scale(1.3)}
-        }
-
-        .input-hint { font-size: 11px; color: #b8a8cc; margin-top: 4px; }
-
-        /* ---- 日期时间选择 ---- */
-        .datetime-row {
-            display: flex; gap: 10px; margin: 12px 0 0;
-        }
-        .dt-input {
-            flex: 1; padding: 12px 10px;
-            border: 2px solid #e8ddf5; border-radius: 12px;
-            font-size: 15px; text-align: center;
-            font-weight: 600; color: #2d1b3d;
-            outline: none; transition: border 0.2s;
-            background: #fdfbff;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .dt-input:focus { border-color: #c44dff; }
+        .footer { text-align:center; margin-top:30px; color:#c8b8d8; font-size:12px; letter-spacing:1px; }
+        .footer .heart { color:#ff6b9d; display:inline-block; animation:heartbeat 1.2s ease-in-out infinite; }
+        @keyframes heartbeat { 0%,100%{transform:scale(1)} 25%{transform:scale(1.3)} 50%{transform:scale(1)} 75%{transform:scale(1.3)} }
     </style>
 </head>
 <body>
 
     <div class="hearts-bg" id="heartsBg"></div>
 
-    <div class="container">
+    <!-- ============ 主页面 ============ -->
+    <div class="container" id="mainPage">
         <div class="header">
             <div class="icon-row">💕</div>
             <h1>想吃什么呢？</h1>
             <p class="subtitle">选一个你想吃的，告诉我~</p>
-            <p class="ver">v2.0 卡通版</p>
+            <p class="ver">v3.0 全面升级版</p>
         </div>
 
+        <!-- 随机按钮 -->
+        <div class="random-row">
+            <button class="btn-random" id="btnRandom" onclick="randomPick()">
+                <span class="rand-emoji">🎲</span> 随便选一个
+            </button>
+        </div>
+
+        <!-- 倒计时条 -->
+        <div class="countdown-bar" id="countdownBar">
+            <div class="cd-title">📅 距离约会还有</div>
+            <div class="cd-food" id="cdFood"></div>
+            <div class="cd-timer" id="cdTimer"></div>
+        </div>
+
+        <!-- 美食网格 -->
         <div class="food-grid" id="foodGrid"></div>
+
+        <!-- 历史记录 -->
+        <div class="history-section" id="historySection">
+            <button class="history-toggle" id="historyToggle" onclick="toggleHistory()">
+                📜 约会记录 <span id="historyCount" style="font-size:11px;color:#d0c0e0;"></span>
+            </button>
+            <div class="history-list" id="historyList"></div>
+        </div>
 
         <div class="footer">
             Made with <span class="heart">❤️</span> for our date
         </div>
     </div>
 
-    <!-- 确认弹窗 -->
+    <!-- ============ 回复确认页 ============ -->
+    <div class="reply-page" id="replyPage">
+        <div class="reply-emoji">✅</div>
+        <h1>收到啦！</h1>
+        <div class="reply-detail" id="replyDetail"></div>
+        <p style="color:#9b8aad;margin-top:8px;">已经记在心里了~ 💕</p>
+    </div>
+
+    <!-- ============ 确认弹窗 ============ -->
     <div class="modal-overlay" id="modalConfirm" style="display:none;">
         <div class="modal-dialog">
             <div class="modal-emoji" id="modalEmoji">🔥</div>
@@ -301,6 +273,10 @@
                 <input type="date" class="dt-input" id="confirmDate">
                 <input type="time" class="dt-input" id="confirmTime" value="18:00">
             </div>
+            <input type="text" class="modal-input" id="confirmNote"
+                placeholder="✏️ 备注（选填）如：订窗边位置~"
+                maxlength="30" autocomplete="off">
+            <p class="input-note">悄悄话会一起发给他哦~</p>
             <div class="modal-buttons">
                 <button class="btn btn-cancel" onclick="closeAllModals()">再想想</button>
                 <button class="btn btn-confirm" id="btnConfirm" onclick="sendNotify()">
@@ -310,7 +286,7 @@
         </div>
     </div>
 
-    <!-- "其他" 输入弹窗 -->
+    <!-- ============ "其他" 弹窗 ============ -->
     <div class="modal-overlay" id="modalOther" style="display:none;">
         <div class="modal-dialog">
             <div class="modal-emoji">✏️</div>
@@ -323,7 +299,10 @@
                 <input type="date" class="dt-input" id="customDate">
                 <input type="time" class="dt-input" id="customTime" value="18:00">
             </div>
-            <p class="input-hint">写好后点确认，就会告诉他啦~</p>
+            <input type="text" class="modal-input" id="customNote"
+                placeholder="✏️ 备注（选填）"
+                maxlength="30" autocomplete="off">
+            <p class="input-note">写好后点确认，就会告诉他啦~</p>
             <div class="modal-buttons">
                 <button class="btn btn-cancel" onclick="closeAllModals()">取消</button>
                 <button class="btn btn-confirm" id="btnCustomConfirm" onclick="confirmCustom()">
@@ -336,187 +315,193 @@
     <script>
         const SENDKEY = 'SCT379441Tav8ooADrFYlXdiwLEZTrvM7D';
         const SERVER_CHAN_URL = 'https://sctapi.ftqq.com';
+        const BASE_URL = 'https://2940552786.github.io/food-picker/';
 
         const foods = [
-            { name: '湘菜',   emoji: '🌶️' },
-            { name: '烤鱼',   emoji: '🐟' },
-            { name: '日料',   emoji: '🍣' },
-            { name: '小火锅', emoji: '🫕' },
-            { name: '烤肉',   emoji: '🥩' },
-            { name: '西餐',   emoji: '🍝' },
-            { name: '麻辣烫', emoji: '🥘' },
-            { name: '披萨',   emoji: '🍕' },
-            { name: '汉堡',   emoji: '🍔' },
+            { name:'湘菜',   emoji:'🌶️' },
+            { name:'烤鱼',   emoji:'🐟' },
+            { name:'日料',   emoji:'🍣' },
+            { name:'小火锅', emoji:'🫕' },
+            { name:'烤肉',   emoji:'🥩' },
+            { name:'西餐',   emoji:'🍝' },
+            { name:'麻辣烫', emoji:'🥘' },
+            { name:'披萨',   emoji:'🍕' },
+            { name:'汉堡',   emoji:'🍔' },
         ];
-
-        const stripeColors = [
-            '#ff6b6b','#ff9f43','#feca57','#ff6348',
-            '#e056a0','#a29bfe','#fd79a8','#fdcb6e','#00b894',
-        ];
+        const stripeColors = ['#ff6b6b','#ff9f43','#feca57','#ff6348','#e056a0','#a29bfe','#fd79a8','#fdcb6e','#00b894'];
 
         let selectedFood = null;
+        let countdownInterval = null;
 
+        // ==================== 初始化 ====================
+        function init() {
+            // 检查是否是回复确认链接
+            const params = new URLSearchParams(location.search);
+            if (params.get('reply') === 'yes') {
+                document.getElementById('mainPage').style.display = 'none';
+                document.getElementById('replyPage').classList.add('show');
+                document.getElementById('replyDetail').textContent =
+                    '带小米粥去吃 ' + (params.get('food') || '好吃的') + '！';
+                return;
+            }
+
+            createHearts();
+            createCards();
+            loadCountdown();
+            renderHistory();
+            setInterval(loadCountdown, 30000); // 每30秒刷新倒计时
+        }
+
+        // ==================== 浮动爱心 ====================
         function createHearts() {
             const c = document.getElementById('heartsBg');
             const hearts = ['💕','💖','💗','💝','💘','❤️','💓','🩷','💌','🌹'];
-            for(let i=0; i<22; i++) {
-                const h = document.createElement('span');
-                h.className = 'heart-float';
-                h.textContent = hearts[Math.floor(Math.random()*hearts.length)];
-                h.style.left = Math.random()*95+'%';
-                h.style.fontSize = (12+Math.random()*24)+'px';
-                h.style.animationDuration = (8+Math.random()*16)+'s';
-                h.style.animationDelay = Math.random()*12+'s';
+            for(let i=0;i<20;i++){
+                const h=document.createElement('span');
+                h.className='heart-float';
+                h.textContent=hearts[Math.floor(Math.random()*hearts.length)];
+                h.style.left=Math.random()*95+'%';
+                h.style.fontSize=(12+Math.random()*24)+'px';
+                h.style.animationDuration=(8+Math.random()*16)+'s';
+                h.style.animationDelay=Math.random()*12+'s';
                 c.appendChild(h);
             }
         }
 
+        // ==================== 生成卡片 ====================
         function createCards() {
-            const grid = document.getElementById('foodGrid');
-
-            foods.forEach((food, i) => {
-                const card = document.createElement('div');
-                card.className = 'food-card';
-                card.onclick = () => openConfirm(food);
-
-                // 顶部彩色条
-                const stripe = document.createElement('div');
-                stripe.className = 'card-stripe';
-                stripe.style.background = stripeColors[i];
-
-                // 大 emoji
-                const emoji = document.createElement('div');
-                emoji.className = 'card-emoji';
-                emoji.textContent = food.emoji;
-
-                // 菜名
-                const name = document.createElement('div');
-                name.className = 'card-name';
-                name.textContent = food.name;
-
+            const grid=document.getElementById('foodGrid');
+            foods.forEach((food,i)=>{
+                const card=document.createElement('div');
+                card.className='food-card';
+                card.onclick=()=>openConfirm(food);
+                const stripe=document.createElement('div');
+                stripe.className='card-stripe';
+                stripe.style.background=stripeColors[i];
+                const emoji=document.createElement('div');
+                emoji.className='card-emoji';
+                emoji.textContent=food.emoji;
+                const name=document.createElement('div');
+                name.className='card-name';
+                name.textContent=food.name;
                 card.appendChild(stripe);
                 card.appendChild(emoji);
                 card.appendChild(name);
                 grid.appendChild(card);
             });
-
-            // "其他" 卡片
-            const other = document.createElement('div');
-            other.className = 'food-card card-other';
-            other.onclick = () => openOther();
-            other.innerHTML = `
-                <div class="card-other-icon">✏️</div>
-                <div class="card-name">其他</div>
-                <div class="card-other-hint">手动输入</div>
-            `;
+            // "其他"
+            const other=document.createElement('div');
+            other.className='food-card card-other';
+            other.onclick=()=>openOther();
+            other.innerHTML='<div class="card-other-icon">✏️</div><div class="card-name">其他</div><div class="card-other-hint">手动输入</div>';
             grid.appendChild(other);
         }
 
+        // ==================== 随机选择 ====================
+        function randomPick() {
+            const btn=document.getElementById('btnRandom');
+            btn.classList.add('spinning');
+            btn.querySelector('.rand-emoji').textContent='🎰';
+
+            // 快速切换动画
+            let count=0;
+            const maxCount=12;
+            const interval=setInterval(()=>{
+                const rand=Math.floor(Math.random()*foods.length);
+                btn.querySelector('.rand-emoji').textContent=foods[rand].emoji;
+                count++;
+                if(count>=maxCount){
+                    clearInterval(interval);
+                    const picked=foods[Math.floor(Math.random()*foods.length)];
+                    btn.querySelector('.rand-emoji').textContent='🎲';
+                    btn.classList.remove('spinning');
+                    openConfirm(picked);
+                }
+            },80);
+        }
+
+        // ==================== 弹窗 ====================
         function openConfirm(food) {
-            selectedFood = { name: food.name, emoji: food.emoji };
-            document.getElementById('modalEmoji').textContent = food.emoji;
-            document.getElementById('modalFoodName').textContent = food.name;
-            // 默认日期：明天
-            const defDate = getDefaultDate();
-            document.getElementById('confirmDate').value = defDate;
-            document.getElementById('confirmDate').min = defDate;
-            document.getElementById('confirmTime').value = '18:00';
-            document.getElementById('modalConfirm').style.display = 'flex';
-            document.getElementById('btnConfirm').disabled = false;
-            document.getElementById('btnConfirm').innerHTML = '✨ 就吃这个！';
+            selectedFood={name:food.name,emoji:food.emoji};
+            document.getElementById('modalEmoji').textContent=food.emoji;
+            document.getElementById('modalFoodName').textContent=food.name;
+            const defDate=getDefaultDate();
+            document.getElementById('confirmDate').value=defDate;
+            document.getElementById('confirmDate').min=defDate;
+            document.getElementById('confirmTime').value='18:00';
+            document.getElementById('confirmNote').value='';
+            document.getElementById('modalConfirm').style.display='flex';
+            document.getElementById('btnConfirm').disabled=false;
+            document.getElementById('btnConfirm').innerHTML='✨ 就吃这个！';
         }
-
         function openOther() {
-            document.getElementById('customFoodInput').value = '';
-            const defDate = getDefaultDate();
-            document.getElementById('customDate').value = defDate;
-            document.getElementById('customDate').min = defDate;
-            document.getElementById('customTime').value = '18:00';
-            document.getElementById('modalOther').style.display = 'flex';
-            document.getElementById('btnCustomConfirm').disabled = false;
-            document.getElementById('btnCustomConfirm').innerHTML = '✨ 就吃这个！';
-            setTimeout(() => document.getElementById('customFoodInput').focus(), 300);
+            document.getElementById('customFoodInput').value='';
+            const defDate=getDefaultDate();
+            document.getElementById('customDate').value=defDate;
+            document.getElementById('customDate').min=defDate;
+            document.getElementById('customTime').value='18:00';
+            document.getElementById('customNote').value='';
+            document.getElementById('modalOther').style.display='flex';
+            document.getElementById('btnCustomConfirm').disabled=false;
+            document.getElementById('btnCustomConfirm').innerHTML='✨ 就吃这个！';
+            setTimeout(()=>document.getElementById('customFoodInput').focus(),300);
         }
-
         function getDefaultDate() {
-            const d = new Date();
-            // 如果今天已经过了20点，默认明天
-            if (d.getHours() >= 20) d.setDate(d.getDate() + 1);
-            return d.getFullYear() + '-' +
-                String(d.getMonth()+1).padStart(2,'0') + '-' +
-                String(d.getDate()).padStart(2,'0');
+            const d=new Date();
+            if(d.getHours()>=20) d.setDate(d.getDate()+1);
+            return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
         }
-
         function confirmCustom() {
-            const input = document.getElementById('customFoodInput');
-            const val = input.value.trim();
-            if (!val) {
-                input.style.borderColor = '#ff4d6a';
-                input.placeholder = '请填写想吃的~';
-                input.focus();
-                return;
-            }
-            selectedFood = { name: val, emoji: '🍽️' };
-            document.getElementById('btnCustomConfirm').disabled = true;
-            document.getElementById('btnCustomConfirm').innerHTML = '<span class="spinner"></span>发送中...';
+            const input=document.getElementById('customFoodInput');
+            const val=input.value.trim();
+            if(!val){ input.style.borderColor='#ff4d6a'; input.placeholder='请填写想吃的~'; input.focus(); return; }
+            selectedFood={name:val,emoji:'🍽️'};
+            document.getElementById('btnCustomConfirm').disabled=true;
+            document.getElementById('btnCustomConfirm').innerHTML='<span class="spinner"></span>发送中...';
             sendNotify();
         }
-
-        document.getElementById('customFoodInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') confirmCustom();
-            this.style.borderColor = '#e8ddf5';
-        });
-
         function closeAllModals() {
-            document.getElementById('modalConfirm').style.display = 'none';
-            document.getElementById('modalOther').style.display = 'none';
-            selectedFood = null;
+            document.getElementById('modalConfirm').style.display='none';
+            document.getElementById('modalOther').style.display='none';
+            selectedFood=null;
         }
-
-        document.getElementById('modalConfirm').addEventListener('click', function(e) {
-            if (e.target === this) closeAllModals();
-        });
-        document.getElementById('modalOther').addEventListener('click', function(e) {
-            if (e.target === this) closeAllModals();
-        });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeAllModals();
+        document.getElementById('modalConfirm').addEventListener('click',function(e){if(e.target===this)closeAllModals();});
+        document.getElementById('modalOther').addEventListener('click',function(e){if(e.target===this)closeAllModals();});
+        document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAllModals();});
+        document.getElementById('customFoodInput').addEventListener('keydown',function(e){
+            if(e.key==='Enter')confirmCustom(); this.style.borderColor='#e8ddf5';
         });
 
+        // ==================== 发送通知 ====================
         async function sendNotify() {
-            if (!selectedFood) return;
-
-            const isCustom = !foods.find(f => f.name === selectedFood.name);
-            const btnId = isCustom ? 'btnCustomConfirm' : 'btnConfirm';
-            const btn = document.getElementById(btnId);
-            const dateId = isCustom ? 'customDate' : 'confirmDate';
-            const timeId = isCustom ? 'customTime' : 'confirmTime';
-
-            // 验证日期和时间已填
-            const dateVal = document.getElementById(dateId).value;
-            const timeVal = document.getElementById(timeId).value;
-            if (!dateVal || !timeVal) {
-                showToast('请选择日期和时间~ 📅', 'error');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span>发送中...';
-
+            if(!selectedFood)return;
+            const isCustom=!foods.find(f=>f.name===selectedFood.name);
+            const btnId=isCustom?'btnCustomConfirm':'btnConfirm';
+            const dateId=isCustom?'customDate':'confirmDate';
+            const timeId=isCustom?'customTime':'confirmTime';
+            const noteId=isCustom?'customNote':'confirmNote';
+            const btn=document.getElementById(btnId);
+            const dateVal=document.getElementById(dateId).value;
+            const timeVal=document.getElementById(timeId).value;
+            const noteVal=document.getElementById(noteId).value.trim();
+            if(!dateVal||!timeVal){ showToast('请选择日期和时间~ 📅','error'); return; }
+            btn.disabled=true;
+            btn.innerHTML='<span class="spinner"></span>发送中...';
             try {
-                // 格式化日期显示
-                const dateObj = new Date(dateVal + 'T' + (timeVal || '00:00'));
-                const days = ['日','一','二','三','四','五','六'];
-                const dayStr = days[dateObj.getDay()];
-                const dateDisplay = dateVal.replace(/-/g, '/') + ' (星期' + dayStr + ')';
-                const timeDisplay = timeVal;
-
-                const resp = await fetch(`${SERVER_CHAN_URL}/${SENDKEY}.send`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: `💕 小米粥想吃的：${selectedFood.emoji} ${selectedFood.name}`,
-                        desp: [
+                const dateObj=new Date(dateVal+'T'+(timeVal||'00:00'));
+                const days=['日','一','二','三','四','五','六'];
+                const dayStr=days[dateObj.getDay()];
+                const dateDisplay=dateVal+' (星期'+dayStr+')';
+                const timeDisplay=timeVal;
+                const noteDisplay=noteVal?'\n| 💬 **备注** | '+noteVal+' |':'';
+                const foodEncoded=encodeURIComponent(selectedFood.name);
+                const replyLink=BASE_URL+'?reply=yes&food='+foodEncoded;
+                const resp=await fetch(`${SERVER_CHAN_URL}/${SENDKEY}.send`,{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        title:`💕 小米粥想吃的：${selectedFood.emoji} ${selectedFood.name}`,
+                        desp:[
                             `## 💕 约会吃什么？`,
                             ``,
                             `| 项目 | 内容 |`,
@@ -524,43 +509,102 @@
                             `| 🍽️ **美食** | **${selectedFood.emoji} ${selectedFood.name}** |`,
                             `| 📅 **日期** | ${dateDisplay} |`,
                             `| ⏰ **时间** | ${timeDisplay} |`,
+                            noteDisplay,
                             ``,
                             `> 快带小米粥去吃 **${selectedFood.name}** 吧！❤️`,
-                        ].join('\n'),
+                            ``,
+                            `[✅ 点我确认收到](${replyLink})`,
+                        ].filter(l=>l!==undefined).join('\n'),
                     }),
                 });
-
-                const data = await resp.json();
-                if (data && data.code === 0) {
+                const data=await resp.json();
+                if(data&&data.code===0){
+                    // 保存到历史
+                    saveHistory({ food:selectedFood.name, emoji:selectedFood.emoji, date:dateVal, time:timeVal, note:noteVal, ts:Date.now() });
+                    // 启动倒计时
+                    saveCountdown({ food:selectedFood.name, emoji:selectedFood.emoji, date:dateVal, time:timeVal });
+                    loadCountdown();
+                    renderHistory();
                     closeAllModals();
-                    showToast('已经告诉 TA 啦~ ❤️', 'success');
-                } else {
-                    throw new Error((data && data.message) || '发送失败');
+                    showToast('已经告诉 TA 啦~ ❤️','success');
+                }else{
+                    throw new Error((data&&data.message)||'发送失败');
                 }
-            } catch (err) {
-                btn.disabled = false;
-                btn.innerHTML = '✨ 就吃这个！';
-                showToast('通知发送失败，请重试 😢', 'error');
-                console.error('Notify error:', err);
+            }catch(err){
+                btn.disabled=false;
+                btn.innerHTML='✨ 就吃这个！';
+                showToast('通知发送失败，请重试 😢','error');
+                console.error('Notify error:',err);
             }
         }
 
-        function showToast(msg, type) {
-            const old = document.querySelector('.toast');
-            if (old) old.remove();
-            const t = document.createElement('div');
-            t.className = `toast toast-${type}`;
-            t.textContent = msg;
-            document.body.appendChild(t);
-            setTimeout(() => {
-                t.style.opacity = '0';
-                t.style.transition = 'opacity 0.4s ease';
-                setTimeout(() => t.remove(), 400);
-            }, 2500);
+        // ==================== 倒计时 ====================
+        function saveCountdown(cd){ localStorage.setItem('foodpicker_countdown',JSON.stringify(cd)); }
+        function loadCountdown(){
+            const bar=document.getElementById('countdownBar');
+            const raw=localStorage.getItem('foodpicker_countdown');
+            if(!raw){ bar.style.display='none'; return; }
+            const cd=JSON.parse(raw);
+            const target=new Date(cd.date+'T'+(cd.time||'00:00'));
+            const now=new Date();
+            const diff=target-now;
+            if(diff<=0){ bar.style.display='none'; localStorage.removeItem('foodpicker_countdown'); return; }
+            bar.style.display='block';
+            document.getElementById('cdFood').textContent=cd.emoji+' '+cd.food;
+            const d=Math.floor(diff/86400000);
+            const h=Math.floor((diff%86400000)/3600000);
+            const m=Math.floor((diff%3600000)/60000);
+            let timer='';
+            if(d>0) timer+=`<span>${d}</span> 天 `;
+            timer+=`<span>${h}</span> 小时 <span>${m}</span> 分钟`;
+            document.getElementById('cdTimer').innerHTML=timer;
         }
 
-        createHearts();
-        createCards();
+        // ==================== 历史记录 ====================
+        function saveHistory(item){
+            const raw=localStorage.getItem('foodpicker_history');
+            const list=raw?JSON.parse(raw):[];
+            list.unshift(item);
+            if(list.length>20) list.length=20;
+            localStorage.setItem('foodpicker_history',JSON.stringify(list));
+        }
+        function renderHistory(){
+            const raw=localStorage.getItem('foodpicker_history');
+            const list=raw?JSON.parse(raw):[];
+            const el=document.getElementById('historyList');
+            const countEl=document.getElementById('historyCount');
+            const toggle=document.getElementById('historyToggle');
+            if(list.length===0){
+                toggle.style.display='none'; el.innerHTML=''; return;
+            }
+            toggle.style.display='flex';
+            countEl.textContent='('+list.length+'次)';
+            el.innerHTML=list.map(item=>{
+                const d=new Date(item.date);
+                const days=['日','一','二','三','四','五','六'];
+                const noteHtml=item.note?`<div class="hi-note">💬 ${item.note}</div>`:'';
+                return `<div class="history-item">
+                    <div><span class="hi-food">${item.emoji} ${item.food}</span>${noteHtml}</div>
+                    <div class="hi-time">${item.date} 周${days[d.getDay()]} ${item.time}</div>
+                </div>`;
+            }).join('');
+        }
+        function toggleHistory(){
+            const el=document.getElementById('historyList');
+            el.classList.toggle('open');
+        }
+
+        // ==================== Toast ====================
+        function showToast(msg,type){
+            const old=document.querySelector('.toast'); if(old) old.remove();
+            const t=document.createElement('div');
+            t.className='toast toast-'+type;
+            t.textContent=msg;
+            document.body.appendChild(t);
+            setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(()=>t.remove(),400); },2500);
+        }
+
+        init();
     </script>
 </body>
 </html>
