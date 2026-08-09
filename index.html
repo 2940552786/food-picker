@@ -528,14 +528,19 @@
                 });
                 const data=await resp.json();
                 if(data&&data.code===200){
-                    saveCountdown({ food:selectedFood.name, emoji:selectedFood.emoji, date:dateVal, time:timeVal });
-                    loadCountdown();
+                    // 先关弹窗告知成功
                     closeAllModals();
-                    // 开始等待确认
-                    currentSelectionId = selId;
-                    localStorage.setItem('foodpicker_pending', JSON.stringify({id:selId, food:selectedFood.name, emoji:selectedFood.emoji, ts:Date.now()}));
-                    startPolling(selId);
-                    showToast('已通知 TA，等待确认中... 💌', 'success');
+                    showToast('已经告诉 TA 啦~ ❤️','success');
+                    // 后台处理倒计时和轮询（不影响主流程）
+                    try {
+                        saveCountdown({ food:selectedFood.name, emoji:selectedFood.emoji, date:dateVal, time:timeVal });
+                        loadCountdown();
+                        currentSelectionId = selId;
+                        localStorage.setItem('foodpicker_pending', JSON.stringify({id:selId, food:selectedFood.name, emoji:selectedFood.emoji, ts:Date.now()}));
+                        startPolling(selId);
+                    } catch(postErr) {
+                        console.error('后处理失败:', postErr);
+                    }
                 }else{
                     throw new Error((data&&data.message)||'发送失败');
                 }
