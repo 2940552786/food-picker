@@ -254,6 +254,21 @@
         }
 
         .input-hint { font-size: 11px; color: #b8a8cc; margin-top: 4px; }
+
+        /* ---- 日期时间选择 ---- */
+        .datetime-row {
+            display: flex; gap: 10px; margin: 12px 0 0;
+        }
+        .dt-input {
+            flex: 1; padding: 12px 10px;
+            border: 2px solid #e8ddf5; border-radius: 12px;
+            font-size: 15px; text-align: center;
+            font-weight: 600; color: #2d1b3d;
+            outline: none; transition: border 0.2s;
+            background: #fdfbff;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .dt-input:focus { border-color: #c44dff; }
     </style>
 </head>
 <body>
@@ -281,7 +296,11 @@
             <div class="modal-emoji" id="modalEmoji">🔥</div>
             <h2>就选这个？</h2>
             <div class="food-name-highlight" id="modalFoodName">火锅</div>
-            <p class="modal-sub">告诉他，带你去吃~</p>
+            <p class="modal-sub">选个时间，告诉他~</p>
+            <div class="datetime-row">
+                <input type="date" class="dt-input" id="confirmDate">
+                <input type="time" class="dt-input" id="confirmTime" value="18:00">
+            </div>
             <div class="modal-buttons">
                 <button class="btn btn-cancel" onclick="closeAllModals()">再想想</button>
                 <button class="btn btn-confirm" id="btnConfirm" onclick="sendNotify()">
@@ -300,6 +319,10 @@
             <input type="text" class="modal-input" id="customFoodInput"
                 placeholder="比如：螺蛳粉、椰子鸡..."
                 maxlength="20" autocomplete="off">
+            <div class="datetime-row">
+                <input type="date" class="dt-input" id="customDate">
+                <input type="time" class="dt-input" id="customTime" value="18:00">
+            </div>
             <p class="input-hint">写好后点确认，就会告诉他啦~</p>
             <div class="modal-buttons">
                 <button class="btn btn-cancel" onclick="closeAllModals()">取消</button>
@@ -393,6 +416,11 @@
             selectedFood = { name: food.name, emoji: food.emoji };
             document.getElementById('modalEmoji').textContent = food.emoji;
             document.getElementById('modalFoodName').textContent = food.name;
+            // 默认日期：明天
+            const defDate = getDefaultDate();
+            document.getElementById('confirmDate').value = defDate;
+            document.getElementById('confirmDate').min = defDate;
+            document.getElementById('confirmTime').value = '18:00';
             document.getElementById('modalConfirm').style.display = 'flex';
             document.getElementById('btnConfirm').disabled = false;
             document.getElementById('btnConfirm').innerHTML = '✨ 就吃这个！';
@@ -400,10 +428,23 @@
 
         function openOther() {
             document.getElementById('customFoodInput').value = '';
+            const defDate = getDefaultDate();
+            document.getElementById('customDate').value = defDate;
+            document.getElementById('customDate').min = defDate;
+            document.getElementById('customTime').value = '18:00';
             document.getElementById('modalOther').style.display = 'flex';
             document.getElementById('btnCustomConfirm').disabled = false;
             document.getElementById('btnCustomConfirm').innerHTML = '✨ 就吃这个！';
             setTimeout(() => document.getElementById('customFoodInput').focus(), 300);
+        }
+
+        function getDefaultDate() {
+            const d = new Date();
+            // 如果今天已经过了20点，默认明天
+            if (d.getHours() >= 20) d.setDate(d.getDate() + 1);
+            return d.getFullYear() + '-' +
+                String(d.getMonth()+1).padStart(2,'0') + '-' +
+                String(d.getDate()).padStart(2,'0');
         }
 
         function confirmCustom() {
@@ -448,19 +489,27 @@
             const isCustom = !foods.find(f => f.name === selectedFood.name);
             const btnId = isCustom ? 'btnCustomConfirm' : 'btnConfirm';
             const btn = document.getElementById(btnId);
+            const dateId = isCustom ? 'customDate' : 'confirmDate';
+            const timeId = isCustom ? 'customTime' : 'confirmTime';
+
+            // 验证日期和时间已填
+            const dateVal = document.getElementById(dateId).value;
+            const timeVal = document.getElementById(timeId).value;
+            if (!dateVal || !timeVal) {
+                showToast('请选择日期和时间~ 📅', 'error');
+                return;
+            }
+
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span>发送中...';
 
             try {
-                const now = new Date();
-                const bj = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }));
-                const timeStr = bj.getFullYear() + '-' +
-                    String(bj.getMonth()+1).padStart(2,'0') + '-' +
-                    String(bj.getDate()).padStart(2,'0') + ' ' +
-                    String(bj.getHours()).padStart(2,'0') + ':' +
-                    String(bj.getMinutes()).padStart(2,'0');
+                // 格式化日期显示
+                const dateObj = new Date(dateVal + 'T' + (timeVal || '00:00'));
                 const days = ['日','一','二','三','四','五','六'];
-                const dayStr = days[bj.getDay()];
+                const dayStr = days[dateObj.getDay()];
+                const dateDisplay = dateVal.replace(/-/g, '/') + ' (星期' + dayStr + ')';
+                const timeDisplay = timeVal;
 
                 const resp = await fetch(`${SERVER_CHAN_URL}/${SENDKEY}.send`, {
                     method: 'POST',
@@ -473,7 +522,8 @@
                             `| 项目 | 内容 |`,
                             `|------|------|`,
                             `| 🍽️ **美食** | **${selectedFood.emoji} ${selectedFood.name}** |`,
-                            `| 📅 **时间** | ${timeStr} (星期${dayStr}) |`,
+                            `| 📅 **日期** | ${dateDisplay} |`,
+                            `| ⏰ **时间** | ${timeDisplay} |`,
                             ``,
                             `> 快带小米粥去吃 **${selectedFood.name}** 吧！❤️`,
                         ].join('\n'),
