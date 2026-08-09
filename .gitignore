@@ -1,0 +1,8 @@
+.env
+.env.example
+api/
+package.json
+vercel.json
+node_modules/
+.vercelignore
+README.md
